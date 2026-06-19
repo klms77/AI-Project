@@ -1,0 +1,17 @@
+# Binary artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+
+# Terraform generated binaries/artifacts
+**/.terraform/
+**/tfplan
+*.tfplan
+
+# Terraform state and lock artifacts
+*.tfstate
+*.tfstate.backup
+*.tfstate.*
+*.tfstate.lock.info

@@ -1,0 +1,214 @@
+day 1 task
+---
+════════════════════════════════════════════════════════════════════════
+ AI for Infrastructure Engineers — Day 1, Lab 1
+ AI Use-Case Mapping Exercise
+ Programme: Digiterati  |  FinBridge Migration Programme
+════════════════════════════════════════════════════════════════════════
+
+INSTRUCTIONS
+────────────
+For each task below, assign ONE tier:
+
+  A — AI Assist (full confidence)
+      AI output can be used directly with minimal review.
+      No production action is taken based on the output.
+
+  B — AI Assist (validate first)
+      AI produces a draft or recommendation.
+      An engineer MUST verify and approve before acting.
+
+  C — Automation / scripting only
+      Deterministic, repeatable task. AI adds no value —
+      a script is more reliable and consistent.
+
+  D — Human decision required
+      Risk, compliance, judgment, or irreversibility involved.
+      AI must NOT make or action this decision.
+
+Work individually for 20 minutes, then compare with your tower.
+Record your Tier and a one-sentence reason for each task.
+
+────────────────────────────────────────────────────────────────────────
+
+TASK 1
+A FinBridge server is showing high iowait in vmstat output.
+Explain what a sustained iowait value above 40% indicates
+and list 3 investigation steps in order of priority.
+
+Tower domain:  Compute
+Your tier: AI Assist (validate first)
+Reason:  Interprets system performance (high iowait) and suggests troubleshooting steps while generally accurate, the insights can affect production so an engineer must validate against diagnostics
+
+TASK 2
+280 monitoring alerts fired in the last 2 hours during a
+FinBridge maintenance window. Summarise the alert groups
+and identify which alerts share a common root cause.
+
+Tower domain:  All towers
+Your tier:  AI Assist (validate first)
+Reason: summarize alerts and cluster them by likely root cause patterns, but correlating monitoring data across systems may miss environmentAn engineer must validate correlations before confirming root cause or taking action.
+
+TASK 3
+Generate a bash script that checks whether payment-service
+is running, and if the health check endpoint returns a
+non-200 response, restarts the service automatically.
+
+Tower domain:  Compute
+Your tier: Automation / scripting only
+Reason:  it's repeatable task (service check and restart logic). A script provides consistent and reliable execution,
+
+TASK 4
+A change window request asks to add an NSG inbound rule
+allowing port 443 from source 0.0.0.0/0 on the production
+payment gateway subnet. Approve or reject this change.
+
+Tower domain:  Network
+Your tier: Human decision required
+Reason:  This change involves a security configuration (opening port 443 to 0.0.0.0/0 on a production subnet), which carries potential risk and compliance implications. It requires human judgment to assess security policies, exposure risk, and business justification before approval or rejection.
+
+TASK 5
+Analyse FinBridge's PostgreSQL slow query log from the last
+24 hours. Identify which queries are missing indexes and
+suggest the specific index commands to create.
+
+Tower domain:  DB
+Your tier:  AI Assist (validate first)
+Reason:  Analyzing slow query logs and recommending indexes requires to check the logs what cause this.
+
+TASK 6
+Recommend the correct Azure VM SKU and disk type for a new
+FinBridge batch processing workload. Requirements: 4 vCPU,
+16GB RAM peak, 500 IOPS sustained, cost-optimised.
+
+Tower domain:  Compute
+Your tier:  AI Assist (validate first)
+Reason:  AI can recommend suitable VM SKUs and disk types based on given requirements (CPU, RAM, IOPS, cost).
+
+TASK 7
+Delete all log files older than 30 days from /var/log/app/
+on the FinBridge application server. Run daily at 02:00 UTC.
+
+Tower domain:  Compute
+Your tier: Automation / scripting only
+Reason:  This is a repeatable maintenance task (log rotation/cleanup on a fixed schedule). A script or cron job is the most reliable and consistent solution,
+
+TASK 8
+The FinBridge primary production database is unresponsive
+during a major incident. Determine whether to fail over to
+the secondary replica immediately or wait for recovery.
+
+Tower domain:  DB
+Your tier:  Human decision required
+Reason: This involves a critical production incident with potential data loss, downtime impact, and business risk. Deciding to fail over requires real-time assessment of replication status, data consistency, and recovery.
+
+TASK 9
+Generate Terraform code for a new Azure VNet (10.0.0.0/16)
+with one app subnet (10.0.1.0/24), one db subnet (10.0.2.0/24),
+and an NSG that allows SSH only from the Bastion subnet.
+
+Tower domain:  Network
+Your tier: Automation / scripting only
+
+Reason:  infrastructure-as-code task with clear specifications (VNet, subnets, NSG rules). Terraform code generation is repeatable to create the resources .
+
+TASK 10
+Review the current NSG ruleset for the FinBridge payment
+processing subnet. Identify any rules that introduce
+security risk and explain why each is a concern.
+
+Tower domain:  Network
+Your tier:  AI Assist (validate first)
+Reason: to add the rule to get the confirmation for the requester or application lead any causing the issue so must validate findings before remediation.
+TASK 11
+The nightly backup job for the final data centre copy is
+causing severe I/O contention, affecting production payment
+writes. Decide whether to cancel the backup job or continue.
+
+Tower domain:  Storage
+Your tier:   Human decision required
+Reason:  High-impact operational decision involving production performance vs. data protection. Canceling or continuing a backup during contention requires real-time assessment of business priorities, recovery objectives, and risk tolerance
+
+TASK 12
+Using 90 days of CPU and memory utilisation metrics for
+vm-app, forecast when the current Standard_B2ms VM will
+need to be resized, and recommend the target SKU.
+
+Tower domain:  Compute
+Your tier:  AI Assist (validate first)
+Reason: CPU/memory data and suggest a resize timeline and SKU we need to get the data to validate and to get the approval to resize the SKU size validation is required.
+
+TASK 13
+Monitor all FinBridge storage volumes and send an automated
+alert to the operations channel when any volume exceeds
+80% utilisation.
+
+Tower domain:  Storage
+Your tier:  Automation / scripting only
+Reason:  monitoring setup (threshold-based alerting). Native monitoring tools or scripts to get the alerts when volumes get 80 % of utilization..
+
+TASK 14
+Analyse access frequency logs for 50 FinBridge storage
+volumes over 90 days. Propose which volumes should be
+migrated from hot tier to cool tier to reduce costs.
+
+Tower domain:  Storage
+Your tier:   AI Assist (validate first)
+Reason:  AI can analyze access patterns and recommend tiering (hot → cool), but incorrect assumptions may impact performance or access latency. A storage engineer must validate before migration.
+
+TASK 15
+Using the engineering RCA and incident timeline, write a
+one-paragraph executive summary of the Tuesday night
+payment outage for the FinBridge CIO.
+
+Tower domain:  All towers
+Your tier: AI Assist
+Reason:  his is a summarization task with no operational risk. AI can reliably produce a concise executive summary from RCA and timelines with minimal review needed.
+
+TASK 16
+FinBridge Finance is evaluating a 3-year Azure Reserved
+Instance commitment for 30 production VMs — total cost
+£240,000 upfront. Approve or reject this commitment.
+
+Tower domain:  Cloud / Finance
+Your tier:  Human decision required
+Reason:  This involves a significant financial commitment and long-term cost/risk trade-offs.as it it related to cose we need to get the approval from the line manager .
+TASK 17
+A schema migration added an index on orders.customer_id
+and is causing connection pool exhaustion. Generate the
+rollback SQL script to drop the index safely.
+
+Tower domain:  DB
+Your tier:  AI Assist (validate first)
+Reason:  AI can generate a correct rollback SQL script  but executing it in production affects performance and availability to check the DBA team first.
+TASK 18
+A new storage replication vendor is proposing an SLA of
+99.5% availability for FinBridge's DR replication service.
+Decide whether this SLA is acceptable for FinBridge's needs.
+
+Tower domain:  Storage
+Your tier:   Human decision required
+Reason: Accepting an SLA involves business risk, compliance requirements, and disaster recovery expectations. This requires human judgment IS REQUIRED.
+
+TASK 19
+Analyse 200 FinBridge service accounts. Using last-login
+date and role data, produce a list of accounts that are
+candidates for deactivation.
+
+Tower domain:  Compute / Security
+Your tier:  AI Assist (validate first)
+Reason: AI can analyze login and role data to flag inactive accounts, but deactivation decisions require validation to avoid disrupting legitimate or service-critical accounts.
+
+TASK 20
+Using the provided log files and timeline from the Friday
+night network outage, produce the post-incident 5-Why
+analysis document.
+
+Tower domain:  Network
+Your tier:  AI Assist
+Reason:  This is an analytical and documentation task (5-Why analysis). AI can accurately structure and produce the document based on provided logs and timeline with minimal risk.
+
+════════════════════════════════════════════════════════════════════════
+ END OF TASK LIST
+ Save your completed classifications as: day1-usecase-mapping.txt
+════════════════════════════════════════════════════════════════════════
