@@ -1,0 +1,57 @@
+Prompt 2: I want to add a public IP to my Azure VM. I have the following command—what values should be used here, and how can I retrieve them?
+az network nic ip-config update --name ipconfig1 --nic-name <NIC_NAME> --resource-group rg-ailab-chayan --public-ip-address myPublicIP
+
+Intent: Map Azure CLI placeholders to actual NIC, IP configuration, and resource group values.
+
+Prompt 3: Yes, the VM name is vm-win.
+Intent: Confirm that the target VM for public IP configuration is vm-win.
+
+Prompt 4: Below is the output. Is it applying the changes correctly?
+Intent: Validate Terraform plan behavior and assess potential risks before applying changes.
+
+Prompt 5: I am okay with Terraform removing the existing VM and NIC configuration to recreate a fresh infrastructure. Is it safe to proceed?
+Intent: Evaluate the safety of a destructive rebuild approach.
+
+Prompt 6: I need the following setup:
+
+Terraform should remove all existing VMs, databases, configurations, and NICs in the Azure lab environment.
+It should recreate the previously configured VMs and database.
+The VMs must have public IPs and be accessible from my machine.
+No resources should exist in Azure that are not managed by Terraform.
+
+Intent: Define the desired end state for a fully Terraform-managed environment with public access to VMs.
+
+Prompt 7: The admin_password should be India@123456, as Azure requires a minimum of 12 characters.
+Intent: Ensure compliance with Azure password policy for Windows VM provisioning.
+
+Prompt 8: You are a senior infrastructure operations engineer. Review the Az-vm-error.log file and provide the following:
+
+Primary incident description
+Plain English explanation
+Whether the events are related
+Causal chain (if applicable)
+Likely root causes (ordered by probability)
+Immediate investigation steps
+Safe remediation options (identify any requiring a maintenance window)
+
+Constraints:
+
+Recommendations must apply to Azure Windows Server 2022
+Clearly indicate any actions requiring a production change window
+Avoid suggesting reboots unless absolutely necessary
+
+Intent: Generate a detailed incident analysis and root cause assessment.
+
+Prompt 9: Please save the response in a file named infrastructure_restore.md, with clearly defined sections such as Symptoms, Root Cause Analysis (RCA), and Solution.
+Intent: Persist the detailed incident report in a structured format.
+
+Prompt 10: Yes, please create it, but as a separate file.
+Intent: Generate an additional executive summary as a standalone document.
+
+Prompt 11: Using all files under the Training folder, create the following within a new folder named Handover_Chayan_user8:
+
+IaC Module: Terraform code with a one-line note explaining how it passed each of the four validation gates, along with a terraform_report.md summarizing the final build analysis.
+Azure_VM_fault: Timestamped observations collected during the incident, in chronological order.
+Azure_VM_RCA: Problem summary, timeline, root cause, fix applied, recovery confirmation, and preventive recommendations.
+Prompt Library: A well-structured document capturing all prompts used in this conversation along with their timeline and explanations.
+Restore.md: A step-by-step guide describing scripts and procedures to restore VM services, including expected outcomes and fallback mechanisms for each step.
