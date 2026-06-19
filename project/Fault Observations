@@ -1,0 +1,38 @@
+Timestamped Observations (Chronological Order)
+2026-06-19 | 17:23:20 – 17:23:29
+
+CPU utilization remained consistently at 100% across all sampled intervals.
+Available memory stayed stable at approximately 2045–2047 MB.
+Disk read/write latency remained near zero, indicating no storage bottleneck.
+
+Process Snapshot During Fault Window
+
+MsMpEng exhibited the highest CPU consumption.
+Multiple PowerShell processes also showed significant CPU usage.
+Azure guest and monitoring agents were active but were not the primary contributors to the load.
+
+
+2026-06-19 | 17:02:13
+
+Event ID 4625 (Warning): Failed network logon for FINBRIDGE\svc-payment due to invalid credentials/path.
+Event ID 1311 (Error): No logon servers available; RPC server unavailable (Error 1722) when contacting DC01.finbridge.internal.
+Event ID 1001 (Warning): PaymentService.exe terminated due to System.OutOfMemoryException.
+Event ID 7034 (Error): Payment Processing Service terminated unexpectedly and was configured for auto-restart.
+
+
+2026-06-19 | 17:23:24
+
+VSS Event (Informational): Indicates idle shutdown; likely not related to the primary issue.
+
+
+Earlier Informational Events
+
+Software Protection Platform service start/stop and scheduling activities were observed.
+No direct correlation was identified with the payment service disruption.
+
+
+Initial Fault Interpretation
+
+Primary Issue: Application memory exhaustion leading to repeated service failures.
+Concurrent Issue: Domain controller communication failure (RPC/logon path disruption).
+Contributing Factor: Sustained CPU saturation, amplifying system instability.
