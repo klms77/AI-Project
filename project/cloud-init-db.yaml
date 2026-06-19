@@ -1,0 +1,14 @@
+#cloud-config
+package_update: true
+packages:
+  - postgresql-14
+  - postgresql-client-14
+runcmd:
+  - systemctl enable postgresql
+  - systemctl start postgresql
+  - sudo -u postgres psql -c "CREATE USER labuser WITH PASSWORD 'Lab@2024!';"
+  - sudo -u postgres psql -c "CREATE DATABASE labdb OWNER labuser;"
+  - sudo -u postgres psql -c "ALTER SYSTEM SET listen_addresses = '10.0.2.10';"
+  - sudo -u postgres psql -c "ALTER SYSTEM SET max_connections = '20';"
+  - echo 'host labdb labuser 10.0.1.0/24 md5' >> /etc/postgresql/14/main/pg_hba.conf
+  - systemctl restart postgresql

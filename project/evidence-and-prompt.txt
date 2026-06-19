@@ -1,0 +1,106 @@
+EVIDENCE LOG (DURING BREAK, IN COLLECTION ORDER)
+
+Note: This log preserves the order evidence was gathered during triage, not pure event chronology.
+
+L1. [Collected first] NSG policy state snapshot (pre-fix)
+- Observation: LabBlock5432 Deny priority 100 for src 10.0.1.0/24 to port 5432 on nsg-db.
+- Observation: AllowPostgres Allow priority 200 for same src/port exists below deny.
+- Timestamp in artifact: Not embedded in rule-list output.
+- Why it mattered: Immediately identified likely policy override.
+
+L2. [Collected second] Azure Activity Log for NSG rule operations
+- 2026-06-19T11:36:17.5754737Z: Create/Update Security Rule Started (LabBlock5432).
+- 2026-06-19T11:36:18.5951190Z: Create/Update Security Rule Succeeded (LabBlock5432).
+- Why it mattered: Established trigger timing and confirmed deny rule introduction as root trigger.
+
+L3. [Collected third] Remediation execution marker
+- Local operator capture: Rule deleted at 11:39:35.
+- Why it mattered: Anchored action start time for restoration timeline.
+
+L4. [Collected fourth] Azure Activity Log delete confirmation
+- 2026-06-19T11:39:38.5611292Z: Delete Security Rule Succeeded (LabBlock5432).
+- Why it mattered: Authoritative cloud-side confirmation that blocking rule removal completed.
+
+L5. [Collected fifth] NSG policy state snapshot (post-fix)
+- Observation: LabBlock5432 absent.
+- Observation: AllowPostgres present.
+- Timestamp in artifact: Not embedded in rule-list output.
+- Why it mattered: Verified intended policy state after change.
+
+L6. [Collected sixth] App-to-DB recovery probe
+- Probe: Test-NetConnection 10.0.2.10:5432 returned TcpTestSucceeded=True.
+- Local capture: APP_DB_CHECK_TIME=11:42:36.
+- Why it mattered: Confirmed service path restoration from app side.
+
+L7. [Collected seventh] DB runtime health probe
+- Query: SELECT count(1) FROM pg_stat_activity returned 6.
+- Local capture: DB_POOL_CHECK_TIME=11:43:47.
+- Why it mattered: Confirmed post-recovery steady state below runbook threshold (<10/20).
+
+Supplemental break-window host telemetry observed:
+- 10:21:57 AM (system): Service Control Manager EventID 7031, RdAgent terminated unexpectedly then restarted.
+- 11:05:26 AM (application): Failed logon (EventID 4625), DC/RPC issue (EventID 1311), PaymentService crash with OutOfMemoryException (EventID 1001), and Payment Processing Service unexpected termination (EventID 7034).
+- These signals were informative but not the dominant causal chain for the confirmed DB path outage, which was policy-block driven (L1-L5).
+
+
+PROMPT LIBRARY (DIAGNOSIS + REMEDIATION)
+
+P1. Incident framing prompt (diagnosis)
+Prompt used:
+"Given NSG rule snapshots, activity log entries, and failed DB connectivity between vm-app and vm-db on 5432, identify the most likely root cause in one sentence and cite the exact evidence IDs."
+Kept from AI output:
+- Root-cause statement: high-priority deny rule overrides lower-priority allow.
+Changed:
+- Tightened wording to include exact rule names and priorities (LabBlock5432=100, AllowPostgres=200).
+Rejected:
+- Generic restart suggestions that did not remove the network policy blocker.
+
+P2. Earliest-trigger extraction prompt (diagnosis)
+Prompt used:
+"From the activity log timeline, return the first event proving incident trigger and provide UTC timestamp plus operation status."
+Kept from AI output:
+- First trigger at 2026-06-19T11:36:17.5754737Z (Create/Update Started).
+Changed:
+- Added succeeding completion event at 11:36:18.5951190Z for completeness.
+Rejected:
+- Any interpretation that trigger time began at remediation start.
+
+P3. Safest-fix decision prompt (remediation selection)
+Prompt used:
+"Compare three actions (restart app service, restart PostgreSQL, remove deny rule) using restore likelihood, blast radius, reversibility, and confidence; recommend one action only."
+Kept from AI output:
+- Recommendation to remove deny rule as fastest, most targeted restoration action.
+Changed:
+- Added explicit confidence rubric and mapped each option to evidence.
+Rejected:
+- Suggestions to restart services first without policy correction.
+
+P4. Command construction prompt (remediation execution)
+Prompt used:
+"Generate the exact Azure CLI command to remove LabBlock5432 from nsg-db in rg-ailab-kishore, plus minimal post-check commands."
+Kept from AI output:
+- az network nsg rule delete with correct resource group, NSG, and rule name.
+Changed:
+- Added explicit post-check sequence: re-list NSG rules, run TCP probe, then DB pool check.
+Rejected:
+- Multi-step optional variants that increased execution time during active incident.
+
+P5. Recovery-validation prompt (post-fix)
+Prompt used:
+"After deleting the rule, provide pass/fail checks proving recovery at network and database layers with timestamp captures."
+Kept from AI output:
+- Required both TCP 5432 success and pg_stat_activity health threshold verification.
+Changed:
+- Standardized timestamp fields (APP_DB_CHECK_TIME, DB_POOL_CHECK_TIME) for auditability.
+Rejected:
+- Single-layer validation (network-only or DB-only) as insufficient.
+
+P6. Reporting prompt (closure artifact)
+Prompt used:
+"Produce a concise RCA including first event, one-sentence root cause, evidence chain, blast radius, immediate action, step-status, metrics, and gaps."
+Kept from AI output:
+- Structured RCA format aligned to incident review requirements.
+Changed:
+- Added explicit contradictions/gaps section and duration vs RTO delta.
+Rejected:
+- Narrative-only formats lacking an evidence register.

@@ -100,9 +100,19 @@ resource "azurerm_subnet_network_security_group_association" "db" {
   network_security_group_id = azurerm_network_security_group.db.id
 }
 
-#Public IP for app access without Bastion
+#Public IP for direct app access
 resource "azurerm_public_ip" "app" {
   name                = "pip-app"
+  location            = azurerm_resource_group.lab.location
+  resource_group_name = azurerm_resource_group.lab.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  tags                = local.common_tags
+}
+
+#Public IP for DB access
+resource "azurerm_public_ip" "db" {
+  name                = "pip-db"
   location            = azurerm_resource_group.lab.location
   resource_group_name = azurerm_resource_group.lab.name
   allocation_method   = "Static"
@@ -135,18 +145,19 @@ resource "azurerm_network_interface" "db" {
     subnet_id                     = azurerm_subnet.db.id
     private_ip_address_allocation = "Static"
     private_ip_address            = "10.0.2.10"
+    public_ip_address_id          = azurerm_public_ip.db.id
   }
 }
 
 #Virtual Machines
-resource "azurerm_linux_virtual_machine" "app" {
+# Requirement: keep exactly one app VM and one DB VM in this lab.
+resource "azurerm_windows_virtual_machine" "app" {
   name                            = "vm-app"
   resource_group_name             = azurerm_resource_group.lab.name
   location                        = azurerm_resource_group.lab.location
   size                            = "Standard_B2ms"
   admin_username                  = "labadmin"
   admin_password                  = var.admin_password
-  disable_password_authentication = false
   network_interface_ids           = [azurerm_network_interface.app.id]
   tags                            = local.common_tags
 
@@ -157,12 +168,12 @@ resource "azurerm_linux_virtual_machine" "app" {
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
-    disk_size_gb         = 30
+    disk_size_gb         = 128
   }
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
     version   = "latest"
   }
 }
@@ -216,7 +227,7 @@ resource "azurerm_storage_account" "lab" {
 
 #Auto-shutdown schedules
 resource "azurerm_dev_test_global_vm_shutdown_schedule" "app" {
-  virtual_machine_id    = azurerm_linux_virtual_machine.app.id
+  virtual_machine_id    = azurerm_windows_virtual_machine.app.id
   location              = azurerm_resource_group.lab.location
   enabled               = true
   daily_recurrence_time = "1300"
